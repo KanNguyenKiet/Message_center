@@ -1,5 +1,9 @@
 package config
 
+import (
+	"github.com/spf13/viper"
+)
+
 type Database struct {
 	Port         string
 	Host         string
@@ -13,7 +17,7 @@ type ServerConfig struct {
 	Database Database
 }
 
-func DefaultLoad() (*ServerConfig, error) {
+func DefaultLoadConfig() *ServerConfig {
 	return &ServerConfig{
 		Env:  "local",
 		Port: "9000",
@@ -23,5 +27,24 @@ func DefaultLoad() (*ServerConfig, error) {
 			Host:         "localhost",
 			DatabaseName: "message_server",
 		},
-	}, nil
+	}
+}
+
+func LoadConfig() (*ServerConfig, error) {
+	cfg := DefaultLoadConfig()
+	viper.AddConfigPath(".")
+	viper.SetConfigName("config")
+	viper.SetConfigType("yaml")
+
+	err := viper.ReadInConfig()
+	if err != nil {
+		return nil, err
+	}
+
+	err = viper.Unmarshal(cfg)
+	if err != nil {
+		return nil, err
+	}
+
+	return cfg, nil
 }

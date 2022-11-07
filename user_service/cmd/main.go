@@ -3,8 +3,8 @@ package main
 import (
 	"fmt"
 	"log"
-	"message-server/api_handler"
-	"message-server/config"
+	"message-server/user_service/api_handler"
+	"message-server/user_service/config"
 	"net/http"
 	"os"
 
@@ -21,7 +21,7 @@ var cfg *config.ServerConfig
 
 func runServer(args []string) error {
 	var err error
-	cfg, err = config.DefaultLoad()
+	cfg, err = config.LoadConfig()
 	if err != nil {
 		log.Fatal(err)
 		return err
