@@ -2,7 +2,15 @@ module message-server
 
 go 1.18
 
-require github.com/urfave/cli/v2 v2.23.4
+require (
+	github.com/golang/protobuf v1.5.2
+	github.com/grpc-ecosystem/grpc-gateway v1.16.0
+	github.com/spf13/viper v1.14.0
+	github.com/urfave/cli/v2 v2.23.4
+	google.golang.org/genproto v0.0.0-20221024183307-1bc688fe9f3e
+	google.golang.org/grpc v1.50.1
+	google.golang.org/protobuf v1.28.1
+)
 
 require (
 	github.com/cpuguy83/go-md2man/v2 v2.0.2 // indirect
@@ -17,10 +25,10 @@ require (
 	github.com/spf13/cast v1.5.0 // indirect
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
-	github.com/spf13/viper v1.14.0 // indirect
 	github.com/subosito/gotenv v1.4.1 // indirect
 	github.com/xrash/smetrics v0.0.0-20201216005158-039620a65673 // indirect
-	golang.org/x/sys v0.0.0-20220908164124-27713097b956 // indirect
+	golang.org/x/net v0.0.0-20221014081412-f15817d10f9b // indirect
+	golang.org/x/sys v0.1.0 // indirect
 	golang.org/x/text v0.4.0 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
