@@ -3,9 +3,8 @@ package main
 import (
 	"fmt"
 	"log"
-	"message-server/user_service/api_handler"
 	"message-server/user_service/config"
-	"net/http"
+	"message-server/user_service/internal/service"
 	"os"
 
 	"github.com/urfave/cli/v2"
@@ -52,10 +51,9 @@ func runServer(args []string) error {
 }
 
 func run(cliCtx *cli.Context) error {
-	muxServer := http.NewServeMux()
-	muxServer.HandleFunc("/get-env", api_handler.GetServerName)
-
-	if err := http.ListenAndServe(cfg.Host+":"+cfg.Port, muxServer); err != nil {
+	err := service.CreateServer(cfg)
+	if err != nil {
+		log.Fatalln("Create server error", err)
 		return err
 	}
 	return nil

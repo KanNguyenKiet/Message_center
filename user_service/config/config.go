@@ -12,16 +12,18 @@ type Database struct {
 
 type ServerConfig struct {
 	Env      string
-	Port     string
 	Host     string
+	HttpPort string
+	GRPCPort string
 	Database Database
 }
 
 func DefaultLoadConfig() *ServerConfig {
 	return &ServerConfig{
-		Env:  "local",
-		Port: "9000",
-		Host: "localhost",
+		Env:      "local",
+		HttpPort: "9080",
+		GRPCPort: "8080",
+		Host:     "localhost",
 		Database: Database{
 			Port:         "8000",
 			Host:         "localhost",
