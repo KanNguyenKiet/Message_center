@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"message-server/common/database/migration"
 	"message-server/user_service/config"
 	"message-server/user_service/internal/service"
 	"os"
@@ -40,6 +41,11 @@ func runServer(args []string) error {
 			Name:   "server",
 			Usage:  "Run message center server",
 			Action: run,
+		},
+		{
+			Name:        "migrate",
+			Usage:       "Migrate database",
+			Subcommands: migration.CliCommand(cfg.MigrateFolder, cfg.Database.String()),
 		},
 	}
 

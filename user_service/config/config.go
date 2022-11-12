@@ -2,33 +2,26 @@ package config
 
 import (
 	"github.com/spf13/viper"
+	"message-server/common/database"
 )
 
-type Database struct {
-	Port         string
-	Host         string
-	DatabaseName string
-}
-
 type ServerConfig struct {
-	Env      string
-	Host     string
-	HttpPort string
-	GRPCPort string
-	Database Database
+	Env           string            `json:"env" mapstructure:"env" yaml:"env"`
+	Host          string            `json:"host" mapstructure:"host" yaml:"host"`
+	HttpPort      string            `json:"httpPort" mapstructure:"httpPort" yaml:"httpPort"`
+	GRPCPort      string            `json:"GRPCPort" mapstructure:"GRPCPort" yaml:"GRPCPort"`
+	Database      database.DBConfig `json:"database" mapstructure:"database" yaml:"database"`
+	MigrateFolder string            `json:"migrateFolder" mapstructure:"migreateFolder" yaml:"migrateFolder"`
 }
 
 func DefaultLoadConfig() *ServerConfig {
 	return &ServerConfig{
-		Env:      "local",
-		HttpPort: "9080",
-		GRPCPort: "8080",
-		Host:     "localhost",
-		Database: Database{
-			Port:         "8000",
-			Host:         "localhost",
-			DatabaseName: "message_server",
-		},
+		Env:           "local",
+		HttpPort:      "9080",
+		GRPCPort:      "8080",
+		Host:          "localhost",
+		Database:      database.MySQLDefaultConfig(),
+		MigrateFolder: "file://sql/migration",
 	}
 }
 
