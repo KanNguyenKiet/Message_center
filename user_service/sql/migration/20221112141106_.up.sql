@@ -4,6 +4,7 @@ CREATE TABLE users (
     first_name NVARCHAR(255),
     phone   NVARCHAR(255),
     email   NVARCHAR(255) NOT NULL,
+    user_name NVARCHAR(255),
     created_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
     last_login TIMESTAMP

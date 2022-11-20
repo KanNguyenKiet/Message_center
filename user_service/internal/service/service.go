@@ -9,24 +9,20 @@ import (
 	"log"
 	"message-server/user_service/api"
 	"message-server/user_service/config"
+	"message-server/user_service/internal/db"
 	"net"
 	"net/http"
 )
 
-// Struct of server
-type server struct {
+// Service Struct of server
+type Service struct {
+	cfg *config.ServerConfig
+	db  db.StoreQuerier
+	// embedded unimplemented service
 	api.UnimplementedUserServiceServer
 }
 
-// RegistUser Assign API Handler for Server
-func (s *server) RegistUser(ctx context.Context, in *api.User) (*api.RegistUserResponse, error) {
-	return &api.RegistUserResponse{
-		Code:    200,
-		Message: "Register successfully",
-	}, nil
-}
-
-func CreateServer(cfg *config.ServerConfig) error {
+func CreateServer(cfg *config.ServerConfig, store db.StoreQuerier) error {
 	// Create GRPC listener
 	lis, err := net.Listen("tcp", ":"+cfg.GRPCPort)
 	if err != nil {
@@ -35,7 +31,10 @@ func CreateServer(cfg *config.ServerConfig) error {
 	}
 
 	s := grpc.NewServer()
-	api.RegisterUserServiceServer(s, &server{})
+	api.RegisterUserServiceServer(s, &Service{
+		cfg: cfg,
+		db:  store,
+	})
 	go func() {
 		fmt.Println("Serving GRPC on port: ", cfg.GRPCPort)
 		log.Fatalln(s.Serve(lis))

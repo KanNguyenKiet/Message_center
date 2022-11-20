@@ -6,9 +6,10 @@ import "google/protobuf/timestamp.proto";
 import "google/api/annotations.proto";
 
 service UserService {
-    rpc RegistUser(User) returns (RegistUserResponse) {
+    rpc RegisterUser(User) returns (RegisterUserResponse) {
         option (google.api.http) = {
-            post: "/user"
+            post: "/user",
+            body: "*"
         };
     };
 }
@@ -24,9 +25,11 @@ message User {
     string phone = 4;
     // Last update
     google.protobuf.Timestamp last_update = 5;
+    // user name
+    string user_name = 6;
 }
 
-message RegistUserResponse {
+message RegisterUserResponse {
     // code
     int32 code = 1;
     // message

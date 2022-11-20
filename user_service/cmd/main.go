@@ -2,13 +2,14 @@ package main
 
 import (
 	"fmt"
+	"github.com/jmoiron/sqlx"
+	"github.com/urfave/cli/v2"
 	"log"
 	"message-server/common/database/migration"
 	"message-server/user_service/config"
+	"message-server/user_service/internal/db"
 	"message-server/user_service/internal/service"
 	"os"
-
-	"github.com/urfave/cli/v2"
 )
 
 func main() {
@@ -57,7 +58,14 @@ func runServer(args []string) error {
 }
 
 func run(cliCtx *cli.Context) error {
-	err := service.CreateServer(cfg)
+	newDb, err := sqlx.Open("mysql", cfg.Database.DSN())
+	if err != nil {
+		log.Fatalln("Connect database failed", err)
+		return err
+	}
+
+	store := db.NewStore(newDb)
+	err = service.CreateServer(cfg, store)
 	if err != nil {
 		log.Fatalln("Create server error", err)
 		return err
