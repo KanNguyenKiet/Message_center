@@ -1,6 +1,6 @@
 syntax = "proto3";
 package message_center.user_service.api;
-option go_package = "user_service/api";
+option go_package = "/api";
 
 import "google/protobuf/timestamp.proto";
 import "google/api/annotations.proto";
@@ -27,6 +27,8 @@ message User {
     google.protobuf.Timestamp last_update = 5;
     // user name
     string user_name = 6;
+    // password
+    string password = 7;
 }
 
 message RegisterUserResponse {

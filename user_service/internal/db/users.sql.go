@@ -35,3 +35,20 @@ func (q *Queries) CreateNewUser(ctx context.Context, arg CreateNewUserParams) (s
 		arg.UserName,
 	)
 }
+
+const createNewUserCredential = `-- name: CreateNewUserCredential :execresult
+INSERT INTO credential(
+    user_id, password_hashed
+) values (
+    ?, ?
+)
+`
+
+type CreateNewUserCredentialParams struct {
+	UserID         int64          `json:"user_id"`
+	PasswordHashed sql.NullString `json:"password_hashed"`
+}
+
+func (q *Queries) CreateNewUserCredential(ctx context.Context, arg CreateNewUserCredentialParams) (sql.Result, error) {
+	return q.db.ExecContext(ctx, createNewUserCredential, arg.UserID, arg.PasswordHashed)
+}

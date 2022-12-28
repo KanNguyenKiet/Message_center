@@ -11,6 +11,7 @@ import (
 
 type Querier interface {
 	CreateNewUser(ctx context.Context, arg CreateNewUserParams) (sql.Result, error)
+	CreateNewUserCredential(ctx context.Context, arg CreateNewUserCredentialParams) (sql.Result, error)
 }
 
 var _ Querier = (*Queries)(nil)

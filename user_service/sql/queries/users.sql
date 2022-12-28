@@ -4,3 +4,10 @@ INSERT INTO users (
 ) values (
     ?, ?, ?, ?, ?
 );
+
+-- name: CreateNewUserCredential :execresult
+INSERT INTO credential(
+    user_id, password_hashed
+) values (
+    ?, ?
+);

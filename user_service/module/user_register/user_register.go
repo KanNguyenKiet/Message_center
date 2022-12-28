@@ -2,7 +2,9 @@ package user_register
 
 import (
 	"context"
+	"crypto/sha256"
 	"database/sql"
+	"fmt"
 	"log"
 	"message-server/user_service/api"
 	"message-server/user_service/config"
@@ -44,9 +46,26 @@ func (u *UserRegisterProcessor) Process(ctx context.Context) error {
 		},
 	}
 	log.Println(createNewUserParams)
-	_, err := u.store.CreateNewUser(ctx, createNewUserParams)
+	result, err := u.store.CreateNewUser(ctx, createNewUserParams)
 	if err != nil {
 		log.Fatalln("Create new user failed")
+		return err
+	}
+	lastUserId, err := result.LastInsertId()
+	if err != nil {
+		log.Fatalln("Get last user id fail")
+		return err
+	}
+	CreateNewUserCredentialParams := db.CreateNewUserCredentialParams{
+		UserID: lastUserId,
+		PasswordHashed: sql.NullString{
+			String: fmt.Sprint(sha256.Sum256([]byte(u.request.Password))),
+			Valid:  true,
+		},
+	}
+	_, err = u.store.CreateNewUserCredential(ctx, CreateNewUserCredentialParams)
+	if err != nil {
+		log.Fatalln("Create credential for user fail!")
 		return err
 	}
 	return nil
