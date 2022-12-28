@@ -2,7 +2,6 @@ package service
 
 import (
 	"context"
-	"fmt"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
@@ -36,7 +35,7 @@ func CreateServer(cfg *config.ServerConfig, store db.StoreQuerier) error {
 		db:  store,
 	})
 	go func() {
-		fmt.Println("Serving GRPC on port: ", cfg.GRPCPort)
+		log.Println("Serving GRPC on port: ", cfg.GRPCPort)
 		log.Fatalln(s.Serve(lis))
 	}()
 
@@ -57,7 +56,7 @@ func CreateServer(cfg *config.ServerConfig, store db.StoreQuerier) error {
 		Addr:    cfg.Host + ":" + cfg.HttpPort,
 		Handler: gwMux,
 	}
-	fmt.Println("Serving http on port: ", cfg.HttpPort)
+	log.Println("Serving http on port: ", cfg.HttpPort)
 	if err = gwServer.ListenAndServe(); err != nil {
 		log.Fatalln(err)
 		return err
