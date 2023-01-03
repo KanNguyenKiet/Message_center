@@ -1,9 +1,11 @@
 package main
 
-import "database/sql"
+import (
+	"github.com/jmoiron/sqlx"
+)
 
-func newDB(dsn string) (*sql.DB, error) {
-	db, err := sql.Open("mysql", dsn)
+func newDB(dsn string) (*sqlx.DB, error) {
+	db, err := sqlx.Open("mysql", dsn)
 	if err != nil {
 		return nil, err
 	}

@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"github.com/jmoiron/sqlx"
 	"github.com/urfave/cli/v2"
 	"log"
 	"message-server/common/database/migration"
@@ -58,7 +57,7 @@ func runServer(args []string) error {
 }
 
 func run(cliCtx *cli.Context) error {
-	newDb, err := sqlx.Open("mysql", cfg.Database.DSN())
+	newDb, err := newDB(cfg.Database.DSN())
 	if err != nil {
 		log.Fatalln("Connect database failed", err)
 		return err
