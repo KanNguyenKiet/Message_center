@@ -66,13 +66,39 @@ func (q *Queries) GetCrendentailByUserId(ctx context.Context, userID int64) (sql
 }
 
 const getUserByUsername = `-- name: GetUserByUsername :one
-SELECT id FROM users
+SELECT id, last_name, first_name, phone, email, user_name, created_at, updated_at, last_login, session_key FROM users
 WHERE user_name = ?
 `
 
-func (q *Queries) GetUserByUsername(ctx context.Context, userName sql.NullString) (int64, error) {
+func (q *Queries) GetUserByUsername(ctx context.Context, userName sql.NullString) (Users, error) {
 	row := q.db.QueryRowContext(ctx, getUserByUsername, userName)
-	var id int64
-	err := row.Scan(&id)
-	return id, err
+	var i Users
+	err := row.Scan(
+		&i.ID,
+		&i.LastName,
+		&i.FirstName,
+		&i.Phone,
+		&i.Email,
+		&i.UserName,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.LastLogin,
+		&i.SessionKey,
+	)
+	return i, err
+}
+
+const updateSessionKey = `-- name: UpdateSessionKey :execresult
+UPDATE users
+SET session_key = ?
+WHERE id = ?
+`
+
+type UpdateSessionKeyParams struct {
+	SessionKey sql.NullString `json:"session_key"`
+	ID         int64          `json:"id"`
+}
+
+func (q *Queries) UpdateSessionKey(ctx context.Context, arg UpdateSessionKeyParams) (sql.Result, error) {
+	return q.db.ExecContext(ctx, updateSessionKey, arg.SessionKey, arg.ID)
 }

@@ -7,7 +7,9 @@ import (
 	"fmt"
 	"message-server/user_service/api"
 	"message-server/user_service/config"
+	"message-server/user_service/extension"
 	"message-server/user_service/internal/db"
+	"time"
 )
 
 type UserLoginProcessor struct {
@@ -25,8 +27,8 @@ func NewUserLoginProcessor(cfg *config.ServerConfig, store db.StoreQuerier, requ
 }
 
 func (u *UserLoginProcessor) Process(ctx context.Context) (bool, error) {
-	// Check username is exist or not?
-	user_id, err := u.store.GetUserByUsername(ctx, sql.NullString{
+	// Check username is existed or not?
+	user, err := u.store.GetUserByUsername(ctx, sql.NullString{
 		Valid:  true,
 		String: u.request.Username,
 	})
@@ -35,14 +37,27 @@ func (u *UserLoginProcessor) Process(ctx context.Context) (bool, error) {
 	}
 
 	// Get user's credential
-	pwd_hashed, err := u.store.GetCrendentailByUserId(ctx, user_id)
+	pwdHashed, err := u.store.GetCrendentailByUserId(ctx, user.ID)
 	if err != nil {
 		return false, err
 	}
 
 	// Check password
-	if fmt.Sprint(sha256.Sum256([]byte(u.request.Password))) != pwd_hashed.String {
+	if fmt.Sprintf("%x", sha256.Sum256([]byte(u.request.Password))) != pwdHashed.String {
 		return false, nil
+	}
+
+	// Generate session key for current user
+	sessionKey := extension.NewSession(user.ID, user.UserName.String, user.Email, time.Now().Add(time.Hour)).GenKey()
+	_, err = u.store.UpdateSessionKey(ctx, db.UpdateSessionKeyParams{
+		SessionKey: sql.NullString{
+			String: sessionKey,
+			Valid:  true,
+		},
+		ID: user.ID,
+	})
+	if err != nil {
+		return false, fmt.Errorf("%s", "Session init failed")
 	}
 
 	return true, nil

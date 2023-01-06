@@ -13,9 +13,14 @@ INSERT INTO credential(
 );
 
 -- name: GetUserByUsername :one
-SELECT id FROM users
+SELECT * FROM users
 WHERE user_name = ?;
 
 -- name: GetCrendentailByUserId :one
 SELECT password_hashed from credential
 WHERE user_id = ?;
+
+-- name: UpdateSessionKey :execresult
+UPDATE users
+SET session_key = ?
+WHERE id = ?;

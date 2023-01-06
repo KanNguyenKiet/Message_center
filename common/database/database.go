@@ -47,5 +47,6 @@ func MySQLDefaultConfig() MySQLConfig {
 		Database: "test",
 		Username: "root",
 		Password: "secret",
+		Option:   "?parseTime=true",
 	}}
 }

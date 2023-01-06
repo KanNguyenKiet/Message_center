@@ -59,7 +59,7 @@ func (u *UserRegisterProcessor) Process(ctx context.Context) error {
 	CreateNewUserCredentialParams := db.CreateNewUserCredentialParams{
 		UserID: lastUserId,
 		PasswordHashed: sql.NullString{
-			String: fmt.Sprint(sha256.Sum256([]byte(u.request.Password))),
+			String: fmt.Sprintf("%x", sha256.Sum256([]byte(u.request.Password))),
 			Valid:  true,
 		},
 	}

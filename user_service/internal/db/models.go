@@ -11,19 +11,20 @@ import (
 type Credential struct {
 	ID             int64          `json:"id"`
 	UserID         int64          `json:"user_id"`
-	PasswordHashed sql.NullString `json:"password_hashed"`
 	CreatedAt      sql.NullTime   `json:"created_at"`
 	UpdateAt       sql.NullTime   `json:"update_at"`
+	PasswordHashed sql.NullString `json:"password_hashed"`
 }
 
 type Users struct {
-	ID        int64          `json:"id"`
-	LastName  sql.NullString `json:"last_name"`
-	FirstName sql.NullString `json:"first_name"`
-	Phone     sql.NullString `json:"phone"`
-	Email     string         `json:"email"`
-	UserName  sql.NullString `json:"user_name"`
-	CreatedAt sql.NullTime   `json:"created_at"`
-	UpdatedAt sql.NullTime   `json:"updated_at"`
-	LastLogin sql.NullTime   `json:"last_login"`
+	ID         int64          `json:"id"`
+	LastName   sql.NullString `json:"last_name"`
+	FirstName  sql.NullString `json:"first_name"`
+	Phone      sql.NullString `json:"phone"`
+	Email      string         `json:"email"`
+	UserName   sql.NullString `json:"user_name"`
+	CreatedAt  sql.NullTime   `json:"created_at"`
+	UpdatedAt  sql.NullTime   `json:"updated_at"`
+	LastLogin  sql.NullTime   `json:"last_login"`
+	SessionKey sql.NullString `json:"session_key"`
 }
