@@ -52,3 +52,27 @@ type CreateNewUserCredentialParams struct {
 func (q *Queries) CreateNewUserCredential(ctx context.Context, arg CreateNewUserCredentialParams) (sql.Result, error) {
 	return q.db.ExecContext(ctx, createNewUserCredential, arg.UserID, arg.PasswordHashed)
 }
+
+const getCrendentailByUserId = `-- name: GetCrendentailByUserId :one
+SELECT password_hashed from credential
+WHERE user_id = ?
+`
+
+func (q *Queries) GetCrendentailByUserId(ctx context.Context, userID int64) (sql.NullString, error) {
+	row := q.db.QueryRowContext(ctx, getCrendentailByUserId, userID)
+	var password_hashed sql.NullString
+	err := row.Scan(&password_hashed)
+	return password_hashed, err
+}
+
+const getUserByUsername = `-- name: GetUserByUsername :one
+SELECT id FROM users
+WHERE user_name = ?
+`
+
+func (q *Queries) GetUserByUsername(ctx context.Context, userName sql.NullString) (int64, error) {
+	row := q.db.QueryRowContext(ctx, getUserByUsername, userName)
+	var id int64
+	err := row.Scan(&id)
+	return id, err
+}

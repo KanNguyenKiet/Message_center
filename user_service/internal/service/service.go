@@ -2,15 +2,16 @@ package service
 
 import (
 	"context"
-	"github.com/grpc-ecosystem/grpc-gateway/runtime"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
 	"log"
 	"message-server/user_service/api"
 	"message-server/user_service/config"
 	"message-server/user_service/internal/db"
 	"net"
 	"net/http"
+
+	"github.com/grpc-ecosystem/grpc-gateway/runtime"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 )
 
 // Service Struct of server
@@ -73,7 +74,7 @@ func CreateServer(cfg *config.ServerConfig, store db.StoreQuerier) error {
 	}
 
 	gwMux := runtime.NewServeMux()
-	err = api.RegisterUserServiceHandler(context.Background(), gwMux, conn)
+	_ = api.RegisterUserServiceHandler(context.Background(), gwMux, conn)
 	gwServer := &http.Server{
 		Addr: cfg.Host + ":" + cfg.HttpPort,
 		// Enable CORS

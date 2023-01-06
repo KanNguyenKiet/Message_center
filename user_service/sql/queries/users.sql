@@ -11,3 +11,11 @@ INSERT INTO credential(
 ) values (
     ?, ?
 );
+
+-- name: GetUserByUsername :one
+SELECT id FROM users
+WHERE user_name = ?;
+
+-- name: GetCrendentailByUserId :one
+SELECT password_hashed from credential
+WHERE user_id = ?;
