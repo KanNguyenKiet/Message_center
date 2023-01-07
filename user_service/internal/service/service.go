@@ -2,12 +2,14 @@ package service
 
 import (
 	"context"
+	"google.golang.org/grpc/metadata"
 	"log"
 	"message-server/user_service/api"
 	"message-server/user_service/config"
 	"message-server/user_service/internal/db"
 	"net"
 	"net/http"
+	"strings"
 
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"google.golang.org/grpc"
@@ -29,18 +31,44 @@ func allowedOrigin(origin string) bool {
 	return true
 }
 
-func cors(h http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if allowedOrigin(r.Header.Get("Origin")) {
-			w.Header().Set("Access-Control-Allow-Origin", r.Header.Get("Origin"))
-			w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PATCH, DELETE")
-			w.Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, Authorization, ResponseType")
-		}
-		if r.Method == "OPTIONS" {
-			return
-		}
-		h.ServeHTTP(w, r)
+func cors(handler http.Handler, writer http.ResponseWriter, request *http.Request) {
+	if allowedOrigin(request.Header.Get("Origin")) {
+		writer.Header().Set("Access-Control-Allow-Origin", request.Header.Get("Origin"))
+		writer.Header().Set("Access-Control-Allow-Methods", "GET, POST, PATCH, DELETE")
+		writer.Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, Authorization, ResponseType")
+	}
+	if request.Method == "OPTIONS" {
+		return
+	}
+	handler.ServeHTTP(writer, request)
+}
+
+func withLogger(request *http.Request) {
+	log.Printf("[%s] -- %s", request.Method, request.RequestURI)
+}
+
+// This function help to apply multiple handler to final one
+func httpHandler(handler http.Handler) http.Handler {
+	return http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
+		// Enable traffic log
+		withLogger(request)
+		// Enable cors
+		cors(handler, writer, request)
 	})
+}
+
+var allowedHeaders = map[string]struct{}{
+	"x-request-id": {},
+}
+
+func isHeaderAllowed(s string) (string, bool) {
+	// check if allowedHeaders contain the header
+	if _, isAllowed := allowedHeaders[s]; isAllowed {
+		// send uppercase header
+		return strings.ToUpper(s), true
+	}
+	// if not in the allowed header, don't send the header
+	return s, false
 }
 
 func CreateServer(cfg *config.ServerConfig, store db.StoreQuerier) error {
@@ -73,12 +101,20 @@ func CreateServer(cfg *config.ServerConfig, store db.StoreQuerier) error {
 		return err
 	}
 
-	gwMux := runtime.NewServeMux()
+	gwMux := runtime.NewServeMux(
+		runtime.WithOutgoingHeaderMatcher(isHeaderAllowed),
+		// Get your custom headers of request and convert to grpc metadata
+		runtime.WithMetadata(func(ctx context.Context, r *http.Request) metadata.MD {
+			sessionKey := r.Header.Get("_session")
+			md := metadata.Pairs("_session", sessionKey)
+			return md
+		}),
+	)
 	_ = api.RegisterUserServiceHandler(context.Background(), gwMux, conn)
 	gwServer := &http.Server{
 		Addr: cfg.Host + ":" + cfg.HttpPort,
 		// Enable CORS
-		Handler: cors(gwMux),
+		Handler: httpHandler(gwMux),
 	}
 	log.Println("Serving http on port: ", cfg.HttpPort)
 	if err = gwServer.ListenAndServe(); err != nil {

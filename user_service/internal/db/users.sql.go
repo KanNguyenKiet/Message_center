@@ -66,7 +66,7 @@ func (q *Queries) GetCrendentailByUserId(ctx context.Context, userID int64) (sql
 }
 
 const getUserByUsername = `-- name: GetUserByUsername :one
-SELECT id, last_name, first_name, phone, email, user_name, created_at, updated_at, last_login, session_key FROM users
+SELECT id, last_name, first_name, phone, email, user_name, created_at, updated_at, last_login, session_key, session_expired FROM users
 WHERE user_name = ?
 `
 
@@ -84,21 +84,50 @@ func (q *Queries) GetUserByUsername(ctx context.Context, userName sql.NullString
 		&i.UpdatedAt,
 		&i.LastLogin,
 		&i.SessionKey,
+		&i.SessionExpired,
 	)
 	return i, err
 }
 
-const updateSessionKey = `-- name: UpdateSessionKey :execresult
+const getUserInfoBySessionKey = `-- name: GetUserInfoBySessionKey :one
+SELECT last_name, first_name, email, phone, session_expired
+FROM users
+WHERE session_key = ?
+`
+
+type GetUserInfoBySessionKeyRow struct {
+	LastName       sql.NullString `json:"last_name"`
+	FirstName      sql.NullString `json:"first_name"`
+	Email          string         `json:"email"`
+	Phone          sql.NullString `json:"phone"`
+	SessionExpired sql.NullTime   `json:"session_expired"`
+}
+
+func (q *Queries) GetUserInfoBySessionKey(ctx context.Context, sessionKey sql.NullString) (GetUserInfoBySessionKeyRow, error) {
+	row := q.db.QueryRowContext(ctx, getUserInfoBySessionKey, sessionKey)
+	var i GetUserInfoBySessionKeyRow
+	err := row.Scan(
+		&i.LastName,
+		&i.FirstName,
+		&i.Email,
+		&i.Phone,
+		&i.SessionExpired,
+	)
+	return i, err
+}
+
+const updateSessionInfo = `-- name: UpdateSessionInfo :execresult
 UPDATE users
-SET session_key = ?
+SET session_key = ?, session_expired = ?
 WHERE id = ?
 `
 
-type UpdateSessionKeyParams struct {
-	SessionKey sql.NullString `json:"session_key"`
-	ID         int64          `json:"id"`
+type UpdateSessionInfoParams struct {
+	SessionKey     sql.NullString `json:"session_key"`
+	SessionExpired sql.NullTime   `json:"session_expired"`
+	ID             int64          `json:"id"`
 }
 
-func (q *Queries) UpdateSessionKey(ctx context.Context, arg UpdateSessionKeyParams) (sql.Result, error) {
-	return q.db.ExecContext(ctx, updateSessionKey, arg.SessionKey, arg.ID)
+func (q *Queries) UpdateSessionInfo(ctx context.Context, arg UpdateSessionInfoParams) (sql.Result, error) {
+	return q.db.ExecContext(ctx, updateSessionInfo, arg.SessionKey, arg.SessionExpired, arg.ID)
 }

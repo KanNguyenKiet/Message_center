@@ -17,14 +17,15 @@ type Credential struct {
 }
 
 type Users struct {
-	ID         int64          `json:"id"`
-	LastName   sql.NullString `json:"last_name"`
-	FirstName  sql.NullString `json:"first_name"`
-	Phone      sql.NullString `json:"phone"`
-	Email      string         `json:"email"`
-	UserName   sql.NullString `json:"user_name"`
-	CreatedAt  sql.NullTime   `json:"created_at"`
-	UpdatedAt  sql.NullTime   `json:"updated_at"`
-	LastLogin  sql.NullTime   `json:"last_login"`
-	SessionKey sql.NullString `json:"session_key"`
+	ID             int64          `json:"id"`
+	LastName       sql.NullString `json:"last_name"`
+	FirstName      sql.NullString `json:"first_name"`
+	Phone          sql.NullString `json:"phone"`
+	Email          string         `json:"email"`
+	UserName       sql.NullString `json:"user_name"`
+	CreatedAt      sql.NullTime   `json:"created_at"`
+	UpdatedAt      sql.NullTime   `json:"updated_at"`
+	LastLogin      sql.NullTime   `json:"last_login"`
+	SessionKey     sql.NullString `json:"session_key"`
+	SessionExpired sql.NullTime   `json:"session_expired"`
 }

@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"database/sql"
+	"google.golang.org/grpc/codes"
 	"message-server/user_service/api"
 	"message-server/user_service/module/user_register"
 )
@@ -18,7 +19,7 @@ func (s *Service) RegisterUser(ctx context.Context, request *api.User) (*api.Reg
 	}
 
 	return &api.RegisterUserResponse{
-		Code:    200,
+		Code:    int32(codes.OK),
 		Message: "Register new account successfully!",
 	}, nil
 }

@@ -19,6 +19,12 @@ service UserService {
             body: "*"
         };
     };
+
+    rpc GetUserInfo(GetUserInfoRequest) returns (GetUserInfoResponse) {
+        option (google.api.http) = {
+            get: "/userinfo",
+        };
+    }
 }
 
 message User {
@@ -59,4 +65,23 @@ message LoginResponse {
     string message = 2;
     // is successful
     bool is_success = 3;
+}
+
+message GetUserInfoRequest {
+
+}
+
+message GetUserInfoResponse {
+    // code
+    int32 code = 1;
+    // message;
+    string message = 2;
+    // User info data
+    message UserInfo {
+        string last_name = 1;
+        string first_name = 2;
+        string email = 3;
+        string phone = 4;
+    }
+    UserInfo data = 3;
 }

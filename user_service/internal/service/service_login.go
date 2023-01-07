@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"database/sql"
+	"google.golang.org/grpc/codes"
 	"log"
 	"message-server/user_service/api"
 	"message-server/user_service/module/user_login"
@@ -19,13 +20,13 @@ func (s *Service) LoginUser(ctx context.Context, request *api.LoginRequest) (*ap
 	})
 	if isSuccess {
 		return &api.LoginResponse{
-			Code:      200,
+			Code:      int32(codes.OK),
 			Message:   "Login successfully!",
 			IsSuccess: isSuccess,
 		}, nil
 	} else {
 		return &api.LoginResponse{
-			Code:      200,
+			Code:      int32(codes.OK),
 			Message:   "Login failed!",
 			IsSuccess: isSuccess,
 		}, nil

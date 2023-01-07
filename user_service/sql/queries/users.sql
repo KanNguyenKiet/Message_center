@@ -20,7 +20,12 @@ WHERE user_name = ?;
 SELECT password_hashed from credential
 WHERE user_id = ?;
 
--- name: UpdateSessionKey :execresult
+-- name: UpdateSessionInfo :execresult
 UPDATE users
-SET session_key = ?
+SET session_key = ?, session_expired = ?
 WHERE id = ?;
+
+-- name: GetUserInfoBySessionKey :one
+SELECT last_name, first_name, email, phone, session_expired
+FROM users
+WHERE session_key = ?;

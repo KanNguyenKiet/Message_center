@@ -14,7 +14,8 @@ type Querier interface {
 	CreateNewUserCredential(ctx context.Context, arg CreateNewUserCredentialParams) (sql.Result, error)
 	GetCrendentailByUserId(ctx context.Context, userID int64) (sql.NullString, error)
 	GetUserByUsername(ctx context.Context, userName sql.NullString) (Users, error)
-	UpdateSessionKey(ctx context.Context, arg UpdateSessionKeyParams) (sql.Result, error)
+	GetUserInfoBySessionKey(ctx context.Context, sessionKey sql.NullString) (GetUserInfoBySessionKeyRow, error)
+	UpdateSessionInfo(ctx context.Context, arg UpdateSessionInfoParams) (sql.Result, error)
 }
 
 var _ Querier = (*Queries)(nil)

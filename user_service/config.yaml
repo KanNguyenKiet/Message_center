@@ -2,5 +2,5 @@ DATABASE:
   HOST: localhost
   PORT: 3306
   USERNAME: root
-  PASSWORD: 28042000Kiet_kan
+  PASSWORD: 123456789
   DATABASE: user_service
