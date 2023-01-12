@@ -26,30 +26,31 @@ func NewUserLoginProcessor(cfg *config.ServerConfig, store db.StoreQuerier, requ
 	}
 }
 
-func (u *UserLoginProcessor) Process(ctx context.Context) (bool, error) {
+func (u *UserLoginProcessor) Process(ctx context.Context) (bool, string, error) {
 	// Check username is existed or not?
 	user, err := u.store.GetUserByUsername(ctx, sql.NullString{
 		Valid:  true,
 		String: u.request.Username,
 	})
 	if err != nil {
-		return false, err
+		return false, "", err
 	}
 
 	// Get user's credential
 	pwdHashed, err := u.store.GetCrendentailByUserId(ctx, user.ID)
 	if err != nil {
-		return false, err
+		return false, "", err
 	}
 
 	// Check password
 	if fmt.Sprintf("%x", sha256.Sum256([]byte(u.request.Password))) != pwdHashed.String {
-		return false, nil
+		return false, "", nil
 	}
 
+	resultSessionKey := user.SessionKey.String
 	// Generate session key for current user
 	// If user still in valid session, do nothing
-	if !user.SessionKey.Valid {
+	if !user.SessionKey.Valid || user.SessionExpired.Time.Before(time.Now()) {
 		sessionExpiredAt := time.Now().Add(time.Hour)
 		sessionKey := extension.NewSession(user.ID, user.UserName.String, user.Email, sessionExpiredAt).GenKey()
 		_, err = u.store.UpdateSessionInfo(ctx, db.UpdateSessionInfoParams{
@@ -64,9 +65,10 @@ func (u *UserLoginProcessor) Process(ctx context.Context) (bool, error) {
 			ID: user.ID,
 		})
 		if err != nil {
-			return false, fmt.Errorf("%s", "Session init failed")
+			return false, "", fmt.Errorf("%s", "Session init failed")
 		}
+		resultSessionKey = sessionKey
 	}
 
-	return true, nil
+	return true, resultSessionKey, nil
 }
