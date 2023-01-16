@@ -35,7 +35,7 @@ func cors(handler http.Handler, writer http.ResponseWriter, request *http.Reques
 	if allowedOrigin(request.Header.Get("Origin")) {
 		writer.Header().Set("Access-Control-Allow-Origin", request.Header.Get("Origin"))
 		writer.Header().Set("Access-Control-Allow-Methods", "GET, POST, PATCH, DELETE")
-		writer.Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, Authorization, ResponseType")
+		writer.Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, Authorization, ResponseType, _session")
 	}
 	if request.Method == "OPTIONS" {
 		return
