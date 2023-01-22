@@ -10,6 +10,16 @@ import (
 	"database/sql"
 )
 
+const clearUserSession = `-- name: ClearUserSession :execresult
+UPDATE users
+SET session_key = null, session_expired = null
+WHERE id = ?
+`
+
+func (q *Queries) ClearUserSession(ctx context.Context, id int64) (sql.Result, error) {
+	return q.db.ExecContext(ctx, clearUserSession, id)
+}
+
 const createNewUser = `-- name: CreateNewUser :execresult
 INSERT INTO users (
     first_name, last_name, email, phone, user_name
@@ -113,6 +123,25 @@ func (q *Queries) GetUserInfoBySessionKey(ctx context.Context, sessionKey sql.Nu
 		&i.Phone,
 		&i.SessionExpired,
 	)
+	return i, err
+}
+
+const getUserSession = `-- name: GetUserSession :one
+SELECT id, session_key, session_expired
+FROM users
+WHERE user_name = ?
+`
+
+type GetUserSessionRow struct {
+	ID             int64          `json:"id"`
+	SessionKey     sql.NullString `json:"session_key"`
+	SessionExpired sql.NullTime   `json:"session_expired"`
+}
+
+func (q *Queries) GetUserSession(ctx context.Context, userName sql.NullString) (GetUserSessionRow, error) {
+	row := q.db.QueryRowContext(ctx, getUserSession, userName)
+	var i GetUserSessionRow
+	err := row.Scan(&i.ID, &i.SessionKey, &i.SessionExpired)
 	return i, err
 }
 

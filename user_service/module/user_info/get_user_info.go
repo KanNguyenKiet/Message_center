@@ -37,9 +37,13 @@ func (g *GetUserInfoProcessor) Process(ctx context.Context) (*api.GetUserInfoRes
 	if err != nil {
 		return nil, err
 	}
+	if !userInfo.SessionExpired.Valid {
+		return nil, errors.New("user is not logged in")
+	}
 	if userInfo.SessionExpired.Time.Before(time.Now()) {
 		return nil, errors.New("session expired")
 	}
+
 	return &api.GetUserInfoResponse_UserInfo{
 		LastName:  userInfo.LastName.String,
 		FirstName: userInfo.FirstName.String,

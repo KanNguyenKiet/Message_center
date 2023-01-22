@@ -10,11 +10,13 @@ import (
 )
 
 type Querier interface {
+	ClearUserSession(ctx context.Context, id int64) (sql.Result, error)
 	CreateNewUser(ctx context.Context, arg CreateNewUserParams) (sql.Result, error)
 	CreateNewUserCredential(ctx context.Context, arg CreateNewUserCredentialParams) (sql.Result, error)
 	GetCrendentailByUserId(ctx context.Context, userID int64) (sql.NullString, error)
 	GetUserByUsername(ctx context.Context, userName sql.NullString) (Users, error)
 	GetUserInfoBySessionKey(ctx context.Context, sessionKey sql.NullString) (GetUserInfoBySessionKeyRow, error)
+	GetUserSession(ctx context.Context, userName sql.NullString) (GetUserSessionRow, error)
 	UpdateSessionInfo(ctx context.Context, arg UpdateSessionInfoParams) (sql.Result, error)
 }
 

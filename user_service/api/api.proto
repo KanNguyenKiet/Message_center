@@ -25,6 +25,13 @@ service UserService {
             get: "/userinfo",
         };
     }
+
+    rpc LogoutUser(LogoutRequest) returns (LogoutResponse) {
+        option (google.api.http) = {
+            put: "/logout",
+            body: "*"
+        };
+    }
 }
 
 message User {
@@ -84,4 +91,18 @@ message GetUserInfoResponse {
         string phone = 4;
     }
     UserInfo data = 3;
+}
+
+message LogoutRequest {
+    // username
+    string username = 1;
+}
+
+message LogoutResponse {
+    // code
+    int32 code = 1;
+    // message
+    string message = 2;
+    // is_success
+    bool is_success = 3;
 }

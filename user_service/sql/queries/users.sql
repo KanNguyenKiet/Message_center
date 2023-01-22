@@ -29,3 +29,13 @@ WHERE id = ?;
 SELECT last_name, first_name, email, phone, session_expired
 FROM users
 WHERE session_key = ?;
+
+-- name: GetUserSession :one
+SELECT id, session_key, session_expired
+FROM users
+WHERE user_name = ?;
+
+-- name: ClearUserSession :execresult
+UPDATE users
+SET session_key = null, session_expired = null
+WHERE id = ?;
