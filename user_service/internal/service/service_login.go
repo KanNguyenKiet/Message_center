@@ -3,16 +3,18 @@ package service
 import (
 	"context"
 	"database/sql"
-	"google.golang.org/grpc/codes"
 	"log"
 	"message-server/user_service/api"
 	"message-server/user_service/module/user_login"
+
+	"google.golang.org/grpc/codes"
 )
 
 func (s *Service) LoginUser(ctx context.Context, request *api.LoginRequest) (*api.LoginResponse, error) {
 	var isSuccess bool
+	var sessionKey string
 	_ = s.db.Transaction(func(tx *sql.Tx) (err error) {
-		isSuccess, err = user_login.NewUserLoginProcessor(s.cfg, s.db.WithTx(tx), request).Process(ctx)
+		isSuccess, sessionKey, err = user_login.NewUserLoginProcessor(s.cfg, s.db.WithTx(tx), request).Process(ctx)
 		if err != nil {
 			log.Println(err)
 		}
@@ -20,9 +22,10 @@ func (s *Service) LoginUser(ctx context.Context, request *api.LoginRequest) (*ap
 	})
 	if isSuccess {
 		return &api.LoginResponse{
-			Code:      int32(codes.OK),
-			Message:   "Login successfully!",
-			IsSuccess: isSuccess,
+			Code:       int32(codes.OK),
+			Message:    "Login successfully!",
+			IsSuccess:  isSuccess,
+			SessionKey: sessionKey,
 		}, nil
 	} else {
 		return &api.LoginResponse{

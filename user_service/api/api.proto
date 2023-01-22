@@ -72,6 +72,8 @@ message LoginResponse {
     string message = 2;
     // is successful
     bool is_success = 3;
+    // session key
+    string session_key = 4;
 }
 
 message GetUserInfoRequest {
