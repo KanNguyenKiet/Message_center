@@ -17,7 +17,7 @@ type ServerConfig struct {
 func DefaultLoadConfig() *ServerConfig {
 	return &ServerConfig{
 		Env:           "local",
-		HttpPort:      "9080",
+		HttpPort:      "9081",
 		GRPCPort:      "8080",
 		Host:          "localhost",
 		Database:      database.MySQLDefaultConfig(),

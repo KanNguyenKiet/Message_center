@@ -44,7 +44,7 @@ func cors(handler http.Handler, writer http.ResponseWriter, request *http.Reques
 }
 
 func withLogger(request *http.Request) {
-	log.Printf("[%s] -- %s", request.Method, request.RequestURI)
+	log.Printf("[%s] -- %s -- %s", request.Method, request.RemoteAddr, request.RequestURI)
 }
 
 // This function help to apply multiple handler to final one
